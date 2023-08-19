@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+
+
+    <application
+        android:name=".utils.Application"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MobiSms"
+        tools:targetApi="31">
+        <activity
+            android:name="com.mobivone.sms.views.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MobiSms">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name=".utils.RunningServices"/>
+        <!-- Register SmsSentReceiver -->
+        <receiver android:name="com.mobivone.sms.broadcast.SmsSentReceiver" />
+        <receiver android:name="com.mobivone.sms.broadcast.SmsDeliveredReceiver" />
+        <receiver android:name="com.mobivone.sms.broadcast.ShutdownReceiver" />
+    </application>
+
+</manifest>
