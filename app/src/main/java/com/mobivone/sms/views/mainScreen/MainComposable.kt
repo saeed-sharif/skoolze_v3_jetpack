@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Context.WIFI_SERVICE
 import android.net.wifi.WifiManager
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mobivone.sms.R
 import com.mobivone.sms.database.AppDatabase
+import com.mobivone.sms.helper.connection
+import com.mobivone.sms.helper.connection.getLocalIpAddress
 import com.mobivone.sms.utils.RunningServices
 import com.mobivone.sms.utils.ServerSetup
 import com.mobivone.sms.utils.dataStored
@@ -53,7 +56,12 @@ fun MainComposable(navController: NavController) {
     val dbitem = viewModel.Itemindb.collectAsState(initial = 0).value
 
     val size = messages.size
-    ipAddress = getLocalIpAddress(context)!!
+     if (connection.isHotspotEnabled(context) ||connection.isWifiEnabled(context)) {
+       ipAddress=getLocalIpAddress()!!
+    } else {
+        Toast.makeText(context, "Hotspot or Wifi Not Enable", Toast.LENGTH_SHORT).show()
+        ipAddress = "Null"
+    }
 
     var port = 5060
     var enteredPort by remember { mutableStateOf(port) }
@@ -88,9 +96,14 @@ fun MainComposable(navController: NavController) {
             CostomappBar(title = "Mobi SMS", infoDailog)
         },
         floatingActionButton = {
-            when (isServiceRunning) {
-                false -> startServerBotton(serverstartdialog)
-                true -> closeServerBotton(serverstopdailog)
+            when (floatingButtonState.value) {
+
+                //when service controling botton
+             /***   false -> startServerBotton(serverstartdialog)
+                true -> closeServerBotton(serverstopdailog)***/
+                //when datastored control botton
+                true -> startServerBotton(serverstartdialog)
+                false -> closeServerBotton(serverstopdailog)
                 else -> null
             }
         }
@@ -251,20 +264,3 @@ fun closeServerBotton(serverstopdailog: MutableState<Boolean>) {
     }
 }
 
-private fun getLocalIpAddress(context: Context): String? {
-    try {
-        val wifiManager: WifiManager = context?.getSystemService(WIFI_SERVICE) as WifiManager
-        return ipToString(wifiManager.connectionInfo.ipAddress)
-    } catch (ex: Exception) {
-        Log.e("IP Address", ex.toString())
-    }
-    return null
-}
-
-private fun ipToString(i: Int): String {
-    return (i and 0xFF).toString() + "." +
-            (i shr 8 and 0xFF) + "." +
-            (i shr 16 and 0xFF) + "." +
-            (i shr 24 and 0xFF)
-
-}
